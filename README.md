@@ -54,6 +54,7 @@ pip install mnemonic[all]
 ## Documentation
 
 - [Quick Start](docs/quickstart.md)
+- [How It Works](docs/How-It-Works.md)
 - [Strategies](docs/strategies.md)
 - [Storage](docs/storage.md)
 - [API Reference](docs/api-reference.md)
