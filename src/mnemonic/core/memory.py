@@ -29,6 +29,8 @@ class MnemonicMemory:
         session_id: Optional[str] = None,
         warning_threshold: float = 0.75,
         critical_threshold: float = 0.90,
+        auto_compact: bool = False,
+        auto_compact_threshold: float = 0.75,
     ):
         self._config = MnemonicConfig(
             max_tokens=max_tokens,
@@ -37,6 +39,10 @@ class MnemonicMemory:
             critical_threshold=critical_threshold,
             session_id=session_id or str(uuid.uuid4()),
         )
+
+        self._auto_compact = auto_compact
+        self._auto_compact_threshold = auto_compact_threshold
+        self._last_compact_result: Optional[CompactionResult] = None
 
         self._token_tracker = TokenTracker(
             encoding=encoding,
@@ -81,6 +87,9 @@ class MnemonicMemory:
 
         item = self._session.add_message(message)
         self._storage.add(item)
+
+        if self._auto_compact and self.usage_ratio >= self._auto_compact_threshold:
+            self._last_compact_result = self.compact()
 
         return item
 
@@ -170,3 +179,11 @@ class MnemonicMemory:
     @property
     def usage_ratio(self) -> float:
         return self._token_tracker.usage_ratio
+
+    @property
+    def auto_compact(self) -> bool:
+        return self._auto_compact
+
+    @property
+    def last_compact_result(self) -> Optional[CompactionResult]:
+        return self._last_compact_result
